@@ -17,8 +17,8 @@ for ((i=0;i<loops;i++)); do
 	
 	# Call callgrind (execution trace)
 	echo -n $input | valgrind --tool=callgrind --callgrind-out-file=${file}.$i.out $file &>/dev/null
-	gprof2dot -f callgrind ${file}.$i.out > ${file}.$i.dot
-	dot -Tpng ${file}.$i.dot > ${file}.$i.png
+	python ./gprof2dot.py -f callgrind ${file}.$i.out > ${file}.$i.dot
+	#dot -Tpng ${file}.$i.dot > ${file}.$i.png
 	
 	# Call cologrind (memory access)
 	echo -n $input | valgrind --tool=cologrind file=${file}.$i.dot &>/dev/null

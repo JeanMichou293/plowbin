@@ -4,8 +4,12 @@
 `plowbin.py`: main script: compiles every source specified in `sources.json`, then call `instrument.sh`  
 `instrument.sh`: passes resulting binaries to callgrind && cologrind
 
-### Usage
-`./plowbin.py`
+### How to
++ Clone [`RosettaCode`](https://github.com/acmeism/RosettaCodeData)
++ Clone this repo next to RosettaCode
++ Install valgrind
++ Install cologrind (valgrind extension)
++ Launch `./plowbin.py`
 
 ### Source parameters
 `compiler_args`: optional args (e.g. linker options)  
