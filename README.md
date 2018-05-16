@@ -8,7 +8,7 @@
 `./plowbin.py`
 
 ### Source parameters
-`compiler_args`: optional args (e.g. linker options)
-`compiler_cmd`: e.g. "gcc ..."
-`file_in`: path to source file, relative to dataset directory
+`compiler_args`: optional args (e.g. linker options)  
+`compiler_cmd`: e.g. "gcc ..."  
+`file_in`: path to source file, relative to dataset directory  
 `file_out`: path to resulting file (binary). `{}` is replaced with the right path
