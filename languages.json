@@ -1,0 +1,14 @@
+{
+	"C": {
+		"compiler_cmd": "gcc {} -o {} {}",
+		"compiler_args": "",
+		"file_out": "{}/a.out",
+		"extension": ".c"
+	},
+	"C++": {
+		"compiler_cmd": "g++ {} -o {} {}",
+		"compiler_args": "",
+		"file_out": "{}/a.out",
+		"extension": ".cpp"
+	}
+}
