@@ -5,12 +5,11 @@ import os
 import sys
 
 
-dataset_dir = './dataset'
+dataset_dir = '../RosettaCodeData/Task'
 language_path = './languages.json'
 source_path = './sources.json'
 compile_all = False
-callgrind_cmd = './callgrind.sh {}'
-cologrind_cmd = 'valgrind --tool=cologrind {}'
+instrument_cmd = './instrument.sh {}'
 
 
 # Colors
@@ -93,12 +92,7 @@ def compile(source):
 	os.system(cmd)
 
 def instrument(source):
-	# Call callgrind
-	cmd = callgrind_cmd.format(source.get_property('file_out'))
-	print_colored(cmd, GREEN)
-	os.system(cmd)
-	# Call cologrind
-	cmd = cologrind_cmd.format(source.get_property('file_out'))
+	cmd = instrument_cmd.format(source.get_property('file_out'))
 	print_colored(cmd, GREEN)
 	os.system(cmd)
 
