@@ -16,8 +16,9 @@ instrument_cmd = './instrument.sh {}'
 PURPLE = '\033[0;35m'
 BLUE = '\033[1;34m'
 GREEN = '\033[1;32m'
+NC = '\033[0;0m'
 def print_colored(msg, color):
-	print(color + msg + '\033[0;0m')
+	print(color + msg + NC)
 
 
 class Language:
