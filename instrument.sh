@@ -7,13 +7,14 @@ loops=10
 # Generate random number of 32-bit words
 _rand_input(){
 	size=$((RANDOM % (max_size - min_size + 1) + min_size))
-	dd if=/dev/urandom count=$size bs=4 2>/dev/null
+	dd if=/dev/urandom count=$size bs=4 2>/dev/null | tr "\0" "\1"
 }
 
 # Main
 file="$1"
 for ((i=0;i<loops;i++)); do
 	input=`_rand_input`
+	#echo -n $input | xxd
 	
 	# Call callgrind (execution trace)
 	echo -n $input | valgrind --tool=callgrind --callgrind-out-file=${file}.$i.out $file &>/dev/null
