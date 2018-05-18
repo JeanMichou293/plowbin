@@ -22,14 +22,15 @@ for ((i=0;i<loops;i++)); do
 	
 	# Call callgrind (execution trace)
 	echo -e "${GREEN}Calling callgrind... ($((i+1))/$loops)${NC}"
-	echo -n $input | valgrind --tool=callgrind --callgrind-out-file=${file}.$i.out $file &>/dev/null
+	echo -n $input | valgrind --tool=callgrind --callgrind-out-file=${file}.$i-call.out $file &>/dev/null
 	echo -e "${GREEN}Converting trace to dot...${NC}"
-	python3 ./gprof2dot.py -f callgrind ${file}.$i.out > ${file}.$i.dot
+	python3 ./gprof2dot.py -f callgrind ${file}.$i-call.out > ${file}.$i-call.dot
 	#dot -Tpng ${file}.$i.dot > ${file}.$i.png
+    python3 ./dot2am.py "call" ${file}.$i-call.dot ${file}.$i-call.am
 	
 	# Call cologrind (memory access)
 	echo -e "${GREEN}Calling cologrind... ($((i+1))/$loops)${NC}"
-	echo -n $input | valgrind --tool=cologrind --cologrind-out-file=${file}.$i.dot $file &>/dev/null
+	echo -n $input | valgrind --tool=cologrind --cologrind-out-file=${file}.$i-colo.dot $file &>/dev/null
 	echo -e "${GREEN}Calling Converting dot to am...${NC}"
-	python3 ./dot2am.py colo ${file}.$i.dot ${file}.$i.am
+	python3 ./dot2am.py "colo" ${file}.$i-colo.dot ${file}.$i-colo.am
 done
