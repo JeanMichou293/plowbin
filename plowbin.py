@@ -3,13 +3,14 @@
 import json
 import os
 import sys
+import argparse
 
 
 dataset_dir = '../RosettaCodeData/Task'
 language_path = './languages.json'
 source_path = './sources.json'
 compile_all = False
-instrument_cmd = './instrument.sh {}'
+instrument_cmd = './instrument.sh {} {} {}'
 
 
 # Colors
@@ -94,13 +95,13 @@ def compile(source):
 	print_colored(cmd, BLUE)
 	os.system(cmd)
 
-def instrument(source):
+def instrument(source, index):
 	category = 'non-sorting' if source.category != 'sorting' else 'sorting'
-	cmd = instrument_cmd.format('"' + source.get_property('file_out') + '"') + category
+	cmd = instrument_cmd.format('"' + source.get_property('file_out') + '"', category, index)
 	print_colored(cmd, GREEN)
 	os.system(cmd)
 
-# Remove every file except source file within every directory under dataset directory
+# Remove every file except source files within every directory under dataset directory
 def clean():
 	language_set = Language.fetch_languages()
 	for folder in os.listdir(dataset_dir):
@@ -125,6 +126,16 @@ def get_first_file(path, file_ext):
 	return None
 
 def main():
+	# Arguments
+	parser = argparse.ArgumentParser()
+	parser.add_argument("--compile", "-c", dest="compile", \
+	 action="store_const", const=True, default=False, \
+	 help="Compile sources")
+	parser.add_argument("--instrument", "-i", dest="instrument", \
+	 action="store_const", const=True, default=False, \
+	 help="Instrument binaries")
+	args = parser.parse_args()
+
 	sources = []
 	#clean()
 	if compile_all:
@@ -152,11 +163,15 @@ def main():
 		sources = Source.fetch_sources()
 	
 	# Process list of sources
+	index = 0
 	for source in sources:
 		print('\n\n')
 		#source.print()
-		compile(source)
-		instrument(source)
+		if args.compile:
+			compile(source)
+		if args.instrument:
+			instrument(source, index)
+			index += 1
 		
 
 if __name__ == '__main__':
