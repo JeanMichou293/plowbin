@@ -32,7 +32,7 @@ class Language:
 
 
 class Source:
-	def __init__(self, file_in, language_set):
+	def __init__(self, file_in, language_set, category):
 		(_, extension) = os.path.splitext(file_in)
 		# Source inherits its language's properties
 		self.lang_properties = Language.from_extension(language_set, extension)
@@ -40,8 +40,9 @@ class Source:
 		(source_dir, _) = os.path.split(file_in_full)
 		file_out_full = self.lang_properties['file_out'].format(source_dir)
 		self.properties = dict({'file_in': file_in_full, 'file_out': file_out_full})
+		self.category = category
 	
-	def __init__(self, file_in, language_set, properties):
+	def __init__(self, file_in, language_set, properties, category):
 		(_, extension) = os.path.splitext(file_in)
 		# Source inherits its language's properties
 		self.lang_properties = Language.from_extension(language_set, extension)
@@ -51,6 +52,7 @@ class Source:
 		file_out_full = self.lang_properties['file_out'].format(source_dir)
 		self.properties['file_in'] = file_in_full
 		self.properties['file_out'] = file_out_full
+		self.category = category
 		
 	# Look for property into intrinsic properties, then into inherited properties from language
 	def get_property(self, property):
@@ -70,7 +72,7 @@ class Source:
 			for _, properties in json_sources.items():
 				# Get intrinsic properties
 				#TODO: duplicate with dict()?
-				source = Source(properties['file_in'], language_set, properties)
+				source = Source(properties['file_in'], language_set, properties, category)
 				# Append source to list
 				sources.append(source)
 		return sources
@@ -93,7 +95,8 @@ def compile(source):
 	os.system(cmd)
 
 def instrument(source):
-	cmd = instrument_cmd.format(source.get_property('file_out'))
+	category = 'non-sorting' if source.category != 'sorting' else 'sorting'
+	cmd = instrument_cmd.format('"' + source.get_property('file_out') + '"') + category
 	print_colored(cmd, GREEN)
 	os.system(cmd)
 

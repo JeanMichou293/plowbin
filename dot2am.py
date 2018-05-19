@@ -11,8 +11,7 @@ else:
     for s, d, w in g.edges(data=True):
         label = ""
         if sys.argv[1] == "call":
-            label = w["label"].encode('utf-8')
-            label = label[:label.find("%")]
+            label = w["label"]
         elif sys.argv[1] == "colo":
             label = g.number_of_edges(s, d) # Should always be 1
         f.write(str(s) + ", " + str(d) + ", " + str(label) + " \n")

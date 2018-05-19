@@ -32,6 +32,7 @@ import collections
 import locale
 import json
 import fnmatch
+import hashlib
 
 # Python 2.x/3.x compatibility
 if sys.version_info[0] >= 3:
@@ -2988,82 +2989,22 @@ class DotWriter:
         fontcolor = theme.graph_fontcolor()
         nodestyle = theme.node_style()
 
-        self.attr('graph', fontname=fontname, ranksep=0.25, nodesep=0.125)
-        self.attr('node', fontname=fontname, shape="box", style=nodestyle, fontcolor=fontcolor, width=0, height=0)
-        self.attr('edge', fontname=fontname)
-
         for _, function in sorted_iteritems(profile.functions):
-            labels = []
-            if function.process is not None:
-                labels.append(function.process)
-            if function.module is not None:
-                labels.append(function.module)
-
-            if self.strip:
-                function_name = function.stripped_name()
-            else:
-                function_name = function.name
-
-            # dot can't parse quoted strings longer than YY_BUF_SIZE, which
-            # defaults to 16K. But some annotated C++ functions (e.g., boost,
-            # https://github.com/jrfonseca/gprof2dot/issues/30) can exceed that
-            MAX_FUNCTION_NAME = 4096
-            if len(function_name) >= MAX_FUNCTION_NAME:
-                sys.stderr.write('warning: truncating function name with %u chars (%s)\n' % (len(function_name), function_name[:32] + '...'))
-                function_name = function_name[:MAX_FUNCTION_NAME - 1] + unichr(0x2026)
-
-            if self.wrap:
-                function_name = self.wrap_function_name(function_name)
-            labels.append(function_name)
-
-            for event in self.show_function_events:
-                if event in function.events:
-                    label = event.format(function[event])
-                    labels.append(label)
-            if function.called is not None:
-                labels.append("%u%s" % (function.called, MULTIPLICATION_SIGN))
-
-            if function.weight is not None:
-                weight = function.weight
-            else:
-                weight = 0.0
-
-            label = '\n'.join(labels)
-            self.node(function.id, 
-                label = label, 
-                color = self.color(theme.node_bgcolor(weight)), 
-                fontcolor = self.color(theme.node_fgcolor(weight)), 
-                fontsize = "%.2f" % theme.node_fontsize(weight),
-                tooltip = function.filename,
-            )
+            # Hash function id
+            hashed_id = str(
+             int(hashlib.md5(function.id.encode('utf-8')).hexdigest(), 16))
+            
+            label = function.called
+            self.node(hashed_id, label = label)
 
             for _, call in sorted_iteritems(function.calls):
                 callee = profile.functions[call.callee_id]
-
-                labels = []
-                for event in self.show_edge_events:
-                    if event in call.events:
-                        label = event.format(call[event])
-                        labels.append(label)
-
-                if call.weight is not None:
-                    weight = call.weight
-                elif callee.weight is not None:
-                    weight = callee.weight
-                else:
-                    weight = 0.0
-
-                label = '\n'.join(labels)
-
-                self.edge(function.id, call.callee_id, 
-                    label = label, 
-                    color = self.color(theme.edge_color(weight)), 
-                    fontcolor = self.color(theme.edge_color(weight)),
-                    fontsize = "%.2f" % theme.edge_fontsize(weight), 
-                    penwidth = "%.2f" % theme.edge_penwidth(weight), 
-                    labeldistance = "%.2f" % theme.edge_penwidth(weight), 
-                    arrowsize = "%.2f" % theme.edge_arrowsize(weight),
-                )
+                label = call[CALLS]
+                
+                # Hash callee id
+                hashed_callee_id = str(int(
+                 hashlib.md5(call.callee_id.encode('utf-8')).hexdigest(), 16))
+                self.edge(hashed_id, hashed_callee_id, label = label)
 
         self.end_graph()
 
@@ -3094,20 +3035,13 @@ class DotWriter:
         self.write(";\n")
 
     def attr_list(self, attrs):
-        if not attrs:
-            return
-        self.write(' [')
-        first = True
-        for name, value in sorted_iteritems(attrs):
-            if value is None:
-                continue
-            if first:
-                first = False
-            else:
-                self.write(", ")
-            self.id(name)
-            self.write('=')
-            self.id(value)
+        self.write(' [label=')
+        #print(attrs)
+        try:
+            self.id(attrs['label'])
+            #print(attrs['label'])
+        except KeyError:
+            pass
         self.write(']')
 
     def id(self, id):
