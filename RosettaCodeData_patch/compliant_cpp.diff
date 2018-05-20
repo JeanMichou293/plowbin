@@ -1,0 +1,23 @@
+--- lzw-compression.cpp	2018-05-16 11:52:36.121738000 +0200
++++ lzw-compression_compliant.cpp	2018-04-20 17:50:22.687124000 +0200
+@@ -1,5 +1,6 @@
+ #include <string>
+ #include <map>
++#include <fstream>
+ 
+ // Compress a string to a list of output symbols.
+ // The result will be written to the output iterator
+@@ -71,7 +72,12 @@
+ 
+ int main() {
+   std::vector<int> compressed;
+-  compress("TOBEORNOTTOBEORTOBEORNOT", std::back_inserter(compressed));
++  
++  std::string buffer = "";
++  for (std::string line; std::getline(std::cin, line);)
++        buffer += line + "\n";
++  
++  compress(buffer, std::back_inserter(compressed));
+   copy(compressed.begin(), compressed.end(), std::ostream_iterator<int>(std::cout, ", "));
+   std::cout << std::endl;
+   std::string decompressed = decompress(compressed.begin(), compressed.end());

@@ -135,6 +135,10 @@ def main():
 	 action="store_const", const=True, default=False, \
 	 help="Instrument binaries")
 	args = parser.parse_args()
+	# If neither -c nor -i is specified, process both by default
+	if not(args.compile or args.instrument):
+		args.compile = True
+		args.instrument = True
 
 	sources = []
 	#clean()
