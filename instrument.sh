@@ -17,20 +17,30 @@ _rand_input(){
 	dd if=/dev/urandom count=$size bs=4 2>/dev/null | tr "\0" "\1"
 }
 
+# Return index of last file in dataset
+_last_index(){
+	path="$1"
+	filename=`bash -c "cd \"$path\" && ls *.dot" | sort -g | tail -n 1`
+	index="${filename%.*}"
+	printf "$index"
+}
+
 # Main
 file="$1"
 category="$2"
 index="$3"
+last_index_call=`_last_index "${dataset_path}/${category}/call"`
+last_index_colo=`_last_index "${dataset_path}/${category}/colo"`
+
 for ((i=0;i<loops;i++)); do
-	j=$((i + index*loop))
 	input=`_rand_input`
-	#echo -n $input | xxd
 	
 	# Call callgrind (execution trace)
 	echo -e "${GREEN}>Calling callgrind... ($((i+1))/$loops)${NC}"
 	echo -n $input | valgrind --tool=callgrind --callgrind-out-file=${file}.$i-call.out $file &>/dev/null
 	
 	echo -e "${GREEN} Converting trace to DOT...${NC}"
+	j=$((i + last_index_call + 1))
 	dot_file="${dataset_path}/${category}/call/${j}.dot"
 	python3 ./gprof2dot.py -f callgrind ${file}.$i-call.out > $dot_file
 	
@@ -42,6 +52,7 @@ for ((i=0;i<loops;i++)); do
 	
 	# Call cologrind (memory access)
 	echo -e "${GREEN}>Calling cologrind... ($((i+1))/$loops)${NC}"
+	j=$((i + last_index_colo + 1))
 	dot_file="${dataset_path}/${category}/colo/${j}.dot"
 	echo -n $input | valgrind --tool=cologrind --cologrind-out-file="$dot_file" $file &>/dev/null
 	

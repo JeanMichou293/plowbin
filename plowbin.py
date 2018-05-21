@@ -10,7 +10,7 @@ dataset_dir = '../RosettaCodeData/Task'
 language_path = './languages.json'
 source_path = './sources.json'
 compile_all = False
-instrument_cmd = './instrument.sh {} {} {}'
+instrument_cmd = './instrument.sh {} {}'
 
 
 # Colors
@@ -95,9 +95,9 @@ def compile(source):
 	print_colored(cmd, BLUE)
 	os.system(cmd)
 
-def instrument(source, index):
-	category = 'non-sorting' if source.category != 'sorting' else 'sorting'
-	cmd = instrument_cmd.format('"' + source.get_property('file_out') + '"', category, index)
+def instrument(source, ref_category):
+	category = 'non-' + ref_category if source.category != ref_category else ref_category
+	cmd = instrument_cmd.format('"' + source.get_property('file_out') + '"', category)
 	print_colored(cmd, GREEN)
 	os.system(cmd)
 
@@ -167,15 +167,13 @@ def main():
 		sources = Source.fetch_sources()
 	
 	# Process list of sources
-	index = 0
 	for source in sources:
 		print('\n\n')
 		#source.print()
 		if args.compile:
 			compile(source)
 		if args.instrument:
-			instrument(source, index)
-			index += 1
+			instrument(source, 'sorting')
 		
 
 if __name__ == '__main__':
