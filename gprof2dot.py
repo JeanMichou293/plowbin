@@ -3251,6 +3251,8 @@ def main():
         profile.prune_leaf(leafIds, options.depth)
 
     dot.graph(profile, theme)
+    
+    print(len(profile.functions))
 
 
 if __name__ == '__main__':
