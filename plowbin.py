@@ -166,6 +166,14 @@ def main():
 		# Fetch every source specified in source_path
 		sources = Source.fetch_sources()
 	
+	# Reset max graph size
+	if args.instrument:
+		try:
+			os.remove("./dataset/callgrind/maxsize")
+			os.remove("./dataset/cologrind/maxsize")
+		except:
+			pass
+	
 	# Process list of sources
 	index = 0
 	for source in sources:
@@ -174,10 +182,6 @@ def main():
 		if args.compile:
 			compile(source)
 		if args.instrument:
-			# Reset max graph size
-			os.remove("./dataset/callgrind/maxsize")
-			os.remove("./dataset/callgrind/maxsize")
-			
 			instrument(source, 'sorting', index)
 			index += 1
 

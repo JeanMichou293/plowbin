@@ -51,10 +51,10 @@ done
 
 # Return max graph size (callgrind)
 file_max_call="${dataset_path}/callgrind/maxsize"
-max=`cat $file_max_call`
+max=`cat $file_max_call || echo -n 0`
 [ $max -lt $callgrind_max_graph_size ] && echo $callgrind_max_graph_size > $file_max_call
 
 # Return max graph size (cologrind)
 file_max_colo="${dataset_path}/cologrind/maxsize"
-max=`cat $file_max_colo`
+max=`cat $file_max_call || echo -n 0`
 [ $max -lt $cologrind_max_graph_size ] && echo $cologrind_max_graph_size > $file_max_colo
