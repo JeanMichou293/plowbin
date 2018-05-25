@@ -57,6 +57,12 @@ for ((i=0;i<loops;i++)); do
 	python3 ./dot2am.py "colo" $dot_file $am_file
 done
 
-# Return max graph size
-echo $callgrind_max_graph_size > "${dataset_path}/callgrind/maxsize"
-echo $cologrind_max_graph_size > "${dataset_path}/cologrind/maxsize"
+# Return max graph size (callgrind)
+file_max_call="${dataset_path}/callgrind/maxsize"
+max=`cat $file_max_call`
+[ $max -lt $callgrind_max_graph_size ] && echo $callgrind_max_graph_size > $file_max_call
+
+# Return max graph size (cologrind)
+file_max_colo="${dataset_path}/cologrind/maxsize"
+max=`cat $file_max_colo`
+[ $max -lt $cologrind_max_graph_size ] && echo $cologrind_max_graph_size > $file_max_colo
