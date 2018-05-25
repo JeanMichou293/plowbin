@@ -38,10 +38,6 @@ for ((i=0;i<loops;i++)); do
 	graph_size=`python3 ./gprof2dot.py -f callgrind ${file}.$i-call.out -o $dot_file`
 	[ $graph_size -gt $callgrind_max_graph_size ] && callgrind_max_graph_size=$graph_size
 	
-	echo -e "${GREEN} Converting DOT to AM...${NC}"
-	am_file="$directory/$category/${j}.am"
-	python3 ./dot2am.py "call" $dot_file $am_file
-	
 	#dot -Tpng ${file}.$i.dot > ${file}.$i.png
 	
 	directory="${dataset_path}/cologrind"
@@ -51,10 +47,6 @@ for ((i=0;i<loops;i++)); do
 	echo -n $input | valgrind --tool=cologrind --cologrind-out-file="$dot_file" $file &>/dev/null
 	graph_size=`cat graphsize`
 	[ $graph_size -gt $cologrind_max_graph_size ] && cologrind_max_graph_size=$graph_size
-	
-	echo -e "${GREEN} Converting DOT to AM...${NC}"
-	am_file="$directory/$category/${j}.am"
-	python3 ./dot2am.py "colo" $dot_file $am_file
 done
 
 # Return max graph size (callgrind)
