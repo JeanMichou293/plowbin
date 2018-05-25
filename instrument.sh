@@ -17,46 +17,46 @@ _rand_input(){
 	dd if=/dev/urandom count=$size bs=4 2>/dev/null | tr "\0" "\1"
 }
 
-# Return index of last file in dataset
-_last_index(){
-	path="$1"
-	filename=`bash -c "cd \"$path\" && ls *.dot" | sort -g | tail -n 1`
-	index="${filename%.*}"
-	printf "$index"
-}
-
 # Main
 file="$1"
 category="$2"
 index="$3"
-last_index_call=`_last_index "${dataset_path}/${category}/call"`
-last_index_colo=`_last_index "${dataset_path}/${category}/colo"`
+callgrind_max_graph_size=0
+cologrind_max_graph_size=0
 
 for ((i=0;i<loops;i++)); do
 	input=`_rand_input`
+	j=$((i + index * loops))
 	
+	directory="${dataset_path}/callgrind"
 	# Call callgrind (execution trace)
 	echo -e "${GREEN}>Calling callgrind... ($((i+1))/$loops)${NC}"
 	echo -n $input | valgrind --tool=callgrind --callgrind-out-file=${file}.$i-call.out $file &>/dev/null
 	
 	echo -e "${GREEN} Converting trace to DOT...${NC}"
-	j=$((i + last_index_call + 1))
-	dot_file="${dataset_path}/${category}/call/${j}.dot"
-	python3 ./gprof2dot.py -f callgrind ${file}.$i-call.out > $dot_file
+	dot_file="$directory/$category/${j}.dot"
+	graph_size=`python3 ./gprof2dot.py -f callgrind ${file}.$i-call.out -o $dot_file`
+	[ $graph_size -gt $callgrind_max_graph_size ] && callgrind_max_graph_size=$graph_size
 	
 	echo -e "${GREEN} Converting DOT to AM...${NC}"
-	am_file="${dataset_path}/${category}/call/${j}.am"
-    python3 ./dot2am.py "call" $dot_file $am_file
+	am_file="$directory/$category/${j}.am"
+	python3 ./dot2am.py "call" $dot_file $am_file
 	
 	#dot -Tpng ${file}.$i.dot > ${file}.$i.png
 	
+	directory="${dataset_path}/cologrind"
 	# Call cologrind (memory access)
 	echo -e "${GREEN}>Calling cologrind... ($((i+1))/$loops)${NC}"
-	j=$((i + last_index_colo + 1))
-	dot_file="${dataset_path}/${category}/colo/${j}.dot"
+	dot_file="$directory/$category/${j}.dot"
 	echo -n $input | valgrind --tool=cologrind --cologrind-out-file="$dot_file" $file &>/dev/null
+	graph_size=`cat graphsize`
+	[ $graph_size -gt $cologrind_max_graph_size ] && cologrind_max_graph_size=$graph_size
 	
 	echo -e "${GREEN} Converting DOT to AM...${NC}"
-	am_file="${dataset_path}/${category}/colo/${j}.am"
+	am_file="$directory/$category/${j}.am"
 	python3 ./dot2am.py "colo" $dot_file $am_file
 done
+
+# Return max graph size
+echo $callgrind_max_graph_size > "${dataset_path}/callgrind/maxsize"
+echo $cologrind_max_graph_size > "${dataset_path}/cologrind/maxsize"
