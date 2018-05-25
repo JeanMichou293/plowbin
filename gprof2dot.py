@@ -2989,23 +2989,27 @@ class DotWriter:
         fontcolor = theme.graph_fontcolor()
         nodestyle = theme.node_style()
 
+        # Hashtable for numbering function ids from 0 to (graphsize - 1)
+        node_list = dict()
+        
         for _, function in sorted_iteritems(profile.functions):
-            # Hash function id
-            hashed_id = str(
-             int(hashlib.md5(function.id.encode('utf-8')).hexdigest(), 16))
+            # Update node list
+            if not(function.id in node_list):
+                node_list[function.id] = len(node_list)
             
             label = function.called
-            self.node(hashed_id, label = label)
+            self.node(node_list[function.id], label = label)
 
             for _, call in sorted_iteritems(function.calls):
+                # Update node list
+                if not(call.callee_id in node_list):
+                    node_list[call.callee_id] = len(node_list)
+                
                 callee = profile.functions[call.callee_id]
                 label = call[CALLS]
                 
-                # Hash callee id
-                hashed_callee_id = str(int(
-                 hashlib.md5(call.callee_id.encode('utf-8')).hexdigest(), 16))
-                self.edge(hashed_id, hashed_callee_id, label = label)
-
+                self.edge(node_list[function.id], node_list[call.callee_id], label = label)
+        
         self.end_graph()
 
     def begin_graph(self):
