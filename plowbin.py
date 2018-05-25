@@ -169,8 +169,8 @@ def main():
 	# Reset max graph size
 	if args.instrument:
 		try:
-			os.remove("./dataset/callgrind/maxsize")
-			os.remove("./dataset/cologrind/maxsize")
+			os.remove("../dataset/callgrind/maxsize")
+			os.remove("../dataset/cologrind/maxsize")
 		except:
 			pass
 	
