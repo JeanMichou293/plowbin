@@ -10,6 +10,24 @@
 	"sorting": {
 		"Sorting-algorithms-Bubble-sort C": {
 			"file_in": "Sorting-algorithms-Bubble-sort/C/sorting-algorithms-bubble-sort.c"
+		},
+		"Sorting-algorithms-Cocktail-sort C": {
+			"file_in": "Sorting-algorithms-Cocktail-sort/C/sorting-algorithms-cocktail-sort-1.c"
+		},
+		"Sorting-algorithms-Cocktail-sort C++": {
+			"file_in": "Sorting-algorithms-Cocktail-sort/C++/sorting-algorithms-cocktail-sort-1.cpp"
+		},
+		"Sorting-algorithms-Heapsort C": {
+			"file_in": "Sorting-algorithms-Heapsort/C/sorting-algorithms-heapsort.c"
+		},
+		"Sorting-algorithms-Merge-sort C": {
+			"file_in": "Sorting-algorithms-Merge-sort/C/sorting-algorithms-merge-sort.c"
+		},
+		"Sorting-algorithms-Pancake-sort C": {
+			"file_in": "Sorting-algorithms-Pancake-sort/C/sorting-algorithms-pancake-sort.c"
+		},
+		"Sorting-algorithms-Quicksort C": {
+			"file_in": "Sorting-algorithms-Quicksort/C/sorting-algorithms-quicksort-1.c"
 		}
 	},
 	"cryptography": {
