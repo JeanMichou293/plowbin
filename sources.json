@@ -10,26 +10,6 @@
 	"sorting": {
 		"Sorting-algorithms-Bubble-sort C": {
 			"file_in": "Sorting-algorithms-Bubble-sort/C/sorting-algorithms-bubble-sort.c"
-		},
-		"Sorting-algorithms-Bubble-sort C++": {
-			"file_in": "Sorting-algorithms-Bubble-sort/C++/sorting-algorithms-bubble-sort.cpp"
-		},
-		"Sorting-algorithms-Merge-sort C": {
-			"file_in": "Sorting-algorithms-Merge-sort/C/sorting-algorithms-merge-sort.c"
-		},
-		"Sorting-algorithms-Merge-sort C++": {
-			"file_in": "Sorting-algorithms-Merge-sort/C++/sorting-algorithms-merge-sort.cpp"
-		},
-		"Sorting-algorithms-Heapsort C": {
-			"file_in": "Sorting-algorithms-Heapsort/C/sorting-algorithms-heapsort.c"
-		},
-		"Sorting-algorithms-Heapsort C++ 1": {
-			"file_in": "Sorting-algorithms-Heapsort/C++/sorting-algorithms-heapsort-1.cpp",
-			"file_out": "a.out1"
-		},
-		"Sorting-algorithms-Heapsort C++ 2": {
-			"file_in": "Sorting-algorithms-Heapsort/C++/sorting-algorithms-heapsort-2.cpp",
-			"file_out": "a.out2"
 		}
 	},
 	"cryptography": {
@@ -38,11 +18,11 @@
 		},
 		"Caesar-cipher C++ 1": {
 			"file_in": "Caesar-cipher/C++/caesar-cipher-1.cpp",
-			"file_out": "a.out1"
+			"file_out": "a1.out"
 		},
 		"Caesar-cipher C++ 2": {
 			"file_in": "Caesar-cipher/C++/caesar-cipher-2.cpp",
-			"file_out": "a.out2"
+			"file_out": "a2.out"
 		},
 		"SHA-256 C": {
 			"file_in": "SHA-256/C/sha-256.c",
