@@ -174,6 +174,10 @@ def main():
 		if args.compile:
 			compile(source)
 		if args.instrument:
+			# Reset max graph size
+			os.remove("./dataset/callgrind/maxsize")
+			os.remove("./dataset/callgrind/maxsize")
+			
 			instrument(source, 'sorting', index)
 			index += 1
 
