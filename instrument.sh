@@ -22,46 +22,73 @@ _rand_input(){
 file="$1"
 category="$2"
 index="$3"
+targeting_mode="$4"
+
 callgrind_max_graph_size=0
 cologrind_max_graph_size=0
 
-for ((i=0;i<loops;i++)); do
+# Targeting mode
+if [ ! -z $targeting_mode ]; then
 	input=`_rand_input`
-	j=$((i + index * loops))
 	
-	directory="${dataset_path}/callgrind"
 	# Call callgrind (execution trace)
-	echo -e "${GREEN}>Calling callgrind... ($((i+1))/$loops)${NC}"
-	echo -n $input | valgrind --tool=callgrind --callgrind-out-file=${file}.$i-call.out $file &>/dev/null
-	
+	echo -e "${GREEN}>Calling callgrind...${NC}"
+	echo -n $input | valgrind --tool=callgrind --callgrind-out-file="${file}.out" "$file" &>/dev/null
 	echo -e "${GREEN} Converting trace to DOT...${NC}"
-	dot_file="$directory/$category/${j}.dot"
-	callgrind_graph_size=`python3 ./gprof2dot.py -f callgrind ${file}.$i-call.out -o $dot_file`
-	[ $callgrind_graph_size -gt $callgrind_max_graph_size ] && callgrind_max_graph_size=$callgrind_graph_size
+	dot_file="./last_call.dot"
+	callgrind_max_graph_size=`python3 ./gprof2dot.py -f callgrind ${file}.out -o $dot_file`
+	echo -e "${GREEN} Generated DOT in ${dot_file}${NC}"
 	
-	#dot -Tpng ${file}.$i.dot > ${file}.$i.png
-	
-	directory="${dataset_path}/cologrind"
 	# Call cologrind (memory access)
-	echo -e "${GREEN}>Calling cologrind... ($((i+1))/$loops)${NC}"
-	dot_file="$directory/$category/${j}.dot"
+	echo -e "${GREEN}>Calling cologrind...${NC}"
+	dot_file="./last_colo.dot"
 	echo -n $input | valgrind --tool=cologrind --cologrind-out-file="$dot_file" $file &>/dev/null
-	cologrind_graph_size=`cat graphsize`
-	[ $cologrind_graph_size -gt $cologrind_max_graph_size ] && cologrind_max_graph_size=$cologrind_graph_size
+	cologrind_max_graph_size=`cat graphsize`
+	echo -e "${GREEN} Generated DOT in ${dot_file}${NC}"
 	
 	# Log
-	echo -e "${file}\t\t${j}\t\t${callgrind_graph_size} (max=${callgrind_max_graph_size})\t\t${cologrind_graph_size} (max=${cologrind_max_graph_size})" >> $logfile
-done
+	echo -e "${file}\t\kaka\t\t${callgrind_graph_size} (max=${callgrind_max_graph_size})\t\t${cologrind_graph_size} (max=${cologrind_max_graph_size})" >> $logfile
+
+# Steam engine mode
+else
+	for ((i=0;i<loops;i++)); do
+		input=`_rand_input`
+		j=$((i + index * loops))
+	
+		directory="${dataset_path}/callgrind"
+		# Call callgrind (execution trace)
+		echo -e "${GREEN}>Calling callgrind... ($((i+1))/$loops)${NC}"
+		echo -n $input | valgrind --tool=callgrind --callgrind-out-file=${file}.$i-call.out $file &>/dev/null
+	
+		echo -e "${GREEN} Converting trace to DOT...${NC}"
+		dot_file="$directory/$category/${j}.dot"
+		callgrind_graph_size=`python3 ./gprof2dot.py -f callgrind ${file}.$i-call.out -o $dot_file`
+		[ $callgrind_graph_size -gt $callgrind_max_graph_size ] && callgrind_max_graph_size=$callgrind_graph_size
+	
+		#dot -Tpng ${file}.$i.dot > ${file}.$i.png
+	
+		directory="${dataset_path}/cologrind"
+		# Call cologrind (memory access)
+		echo -e "${GREEN}>Calling cologrind... ($((i+1))/$loops)${NC}"
+		dot_file="$directory/$category/${j}.dot"
+		echo -n $input | valgrind --tool=cologrind --cologrind-out-file="$dot_file" $file &>/dev/null
+		cologrind_graph_size=`cat graphsize`
+		[ $cologrind_graph_size -gt $cologrind_max_graph_size ] && cologrind_max_graph_size=$cologrind_graph_size
+	
+		# Log
+		echo -e "${file}\t\t${j}\t\t${callgrind_graph_size} (max=${callgrind_max_graph_size})\t\t${cologrind_graph_size} (max=${cologrind_max_graph_size})" >> $logfile
+	done
+fi
 
 # Return max graph size (callgrind)
 file_max_call="${dataset_path}/callgrind/maxsize"
 callgrind_absolute_max=`cat $file_max_call || echo -n 0`
-[ $callgrind_absolute_max -lt $callgrind_max_graph_size ] && echo $callgrind_max_graph_size > $file_max_call
+[ $callgrind_absolute_max -lt $callgrind_max_graph_size ] && echo $callgrind_max_graph_size > "$file_max_call"
 
 # Return max graph size (cologrind)
 file_max_colo="${dataset_path}/cologrind/maxsize"
 cologrind_absolute_max=`cat $file_max_colo || echo -n 0`
-[ $cologrind_absolute_max -lt $cologrind_max_graph_size ] && echo $cologrind_max_graph_size > $file_max_colo
+[ $cologrind_absolute_max -lt $cologrind_max_graph_size ] && echo $cologrind_max_graph_size > "$file_max_colo"
 
 # Log
-echo -e "callgrind_max_graph_size=${callgrind_absolute_max}\t\tcologrind_max_graph_size=${cologrind_absolute_max}\n" >> $logfile
+echo -e "callgrind_absolute_max=${callgrind_absolute_max}\t\cologrind_absolute_max=${cologrind_absolute_max}\n" >> $logfile
