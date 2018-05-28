@@ -86,14 +86,13 @@ def compile(source):
 	print_colored(cmd, BLUE)
 	os.system(cmd)
 
-def instrument(source=None, ref_category=None, index=None, binary_path=None):
+def instrument(source=None, index=None, binary_path=None):
 	# Targeting mode
 	if binary_path != None:
 		cmd = instrument_cmd.format('"' + binary_path + '"', '""', '""', 'fistouille')
 	# Steam engine mode
 	else:
-		category = 'non-' + ref_category if source.category != ref_category else ref_category
-		cmd = instrument_cmd.format('"' + source.get_property('file_out') + '"', category, index, '""')
+		cmd = instrument_cmd.format('"' + source.get_property('file_out') + '"', source.category, index, '""')
 	print_colored(cmd, GREEN)
 	os.system(cmd)
 
@@ -189,7 +188,7 @@ def main():
 			if args.compile:
 				compile(source)
 			if args.instrument:
-				instrument(source=source, ref_category='sorting', index=index)
+				instrument(source=source, index=index)
 				index += 1
 	
 	exit(0)
